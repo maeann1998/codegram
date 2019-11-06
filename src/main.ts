@@ -209,6 +209,18 @@ class ViewModel {
         }
     }
 
+    renderList() {
+        const list = this.element.querySelectorAll('[tl-list]');
+        if (list && list.length) {
+            list.forEach(
+                item => {
+                    const path = item.getAttribute('tl-list');
+                    item.innerHTML = get(this.model, path);
+                }
+            );
+        }
+    }
+
     render() {
         const list = this.element.querySelectorAll('[tl-bind]');
         if (list && list.length) {
@@ -225,6 +237,15 @@ class ViewModel {
 class SomeComponent {
     title = 'Hello';
     user = { name: 'Alexey' };
+    elements: any = [];
+    constructor() {
+        setTimeout(
+            () => {
+                this.elements = [{name: 'Penis', id: 2}, { name: 'Denis', id: 3 }];
+            }, 2000
+        );
+    }
+
 
     onCounterPlus() {
         this.title = 'Pidor';
