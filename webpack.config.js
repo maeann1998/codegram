@@ -10,7 +10,7 @@ module.exports = {
     entry: {
         'main': './main.ts'
     },
-    
+
     output: {
         filename: '[name].bundle.js',
         path: DESTINATION
@@ -26,6 +26,15 @@ module.exports = {
 
     module: {
         rules: [
+            {
+                test: /\.html$/,
+                use: {
+                    loader: 'html-loader',
+                    options: {
+                        attrs: [':data-src']
+                    }
+                }
+            },
             /****************
             * PRE-LOADERS
             *****************/

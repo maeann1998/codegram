@@ -5,74 +5,8 @@ import * as LocalForage from 'localforage';
 import { apiClient } from './core/telegram-client';
 import { TelegramAPI } from './lib/api/client';
 
-// const storage = {
-//     get (key: string) { return LocalForage.getItem(key); },
-//     set (key: string, value: any){ return LocalForage.setItem(key, value); },
-//     remove (...keys: string[]){ return Promise.all(keys.map(key => LocalForage.removeItem(key))); },
-//     clear() { return LocalForage.clear(); }
-// };
-//
-// console.log(1111, MTProto, LocalForage);
-// const phone = {
-//     num : '+79126252815',
-//     code: '22222'
-// };
-//
-//
-// const api = {
-//     layer          : 57,
-//     initConnection : 0x69796de9,
-//     api_id         : 49631
-// };
-
-// const server = {
-//     dev: true //We will connect to the test server.
-// };           //Any empty configurations fields can just not be specified
-//
-// const client = MTProto({ server, api });
-
-// async function connect(){
-//     const sendCodeResponse = await client('auth.sendCode', {
-//         phone_number  : phone.num,
-//         current_number: false,
-//         api_id        : 49631,
-//         api_hash      : 'fb050b8f6771e15bfda5df2409931569',
-//         type: 'auth.sentCodeTypeApp'
-//     });
-//
-//     console.log(sendCodeResponse);
-//     // @ts-ignore
-//     window.onSentCode = async (code) => {
-//         const { user } = await client('auth.signIn', {
-//             phone_number: phone.num,
-//             // phone_code_hash: sendCodeResponse.phone_code_hash,
-//             phone_code: code
-//         });
-//
-//         // const { user } = await client('auth.signUp', {
-//         //     phone_number: phone.num,
-//         //     phone_code_hash: sendCodeResponse.phone_code_hash,
-//         //     first_name: 'Yaroslav-kakashkin',
-//         //     last_name: 'Alexey-sosulkin',
-//         //     phone_code: code
-//         // });
-//         console.log('sign user', user);
-//
-//
-//     };
-//
-//
-//     // @ts-ignore
-//     // window.chats = async () => {
-//     //     const chats = await client('contacts.getContacts');
-//     //
-//     //     console.log('chats', chats);
-//     // };
-//
-//     // console.log('signed as ', user)
-// }
-
-// connect();
+// @ts-ignore
+window.tltl = apiClient;
 
 async function getContacts() {
     console.log('waaat?');
@@ -94,7 +28,7 @@ function bootstrap(): Promise<void> {
     });
 }
 
- async function signIn(phone_number: string, phone_code_hash: string, phone_code: string) {
+async function signIn(phone_number: string, phone_code_hash: string, phone_code: string) {
         const { user } = await apiClient.call('auth', 'signIn', {
             phone_number,
             phone_code_hash,
@@ -102,6 +36,19 @@ function bootstrap(): Promise<void> {
         });
         return user;
 }
+
+async function signUp(phone_number: string, phone_code_hash: string, phone_code: string) {
+    const { user } = await apiClient.call('auth', 'signUp', {
+        phone_number,
+        phone_code_hash,
+        phone_code,
+        first_name: 'Saska',
+        last_name: 'Bobrov'
+    });
+    return user;
+}
+
+
 
 async function sentCode(phone_number: string) {
     const params = {
@@ -123,6 +70,7 @@ bootstrap().then(
         const getCodeBtn = document.querySelector('[data-app-id="getCode"]');
         const signInBtn = document.querySelector('[data-app-id="signIn"]');
         const getContactsBtn = document.querySelector('[data-app-id="getContacts"]');
+        const signUpBtn = document.querySelector('[data-app-id="signUp"]');
 
         let resultSentCode: any;
 
@@ -141,5 +89,159 @@ bootstrap().then(
         getContactsBtn.addEventListener('click', async evt => {
            getContacts();
         });
+
+        signUpBtn.addEventListener('click', async evt => {
+            const phoneValue = phone.value;
+            const codeValue = code.value;
+            console.log('code value', codeValue);
+            resultSentCode = await signUp(phoneValue, resultSentCode.phone_code_hash, codeValue);
+        });
     }
 );
+
+
+// function Component(
+//     template: string,
+//     controller: () => void,
+// ) {
+//
+
+//     const _controller = new SimpleComponent();
+//     const element = htmlToElement(template);
+//
+//     console.log('eleement', element, _controller);
+//     // console.log('require', require);
+//     // const template = import(templateUrl);
+//     // console.log('template', template);
+// }
+//
+//
+// class SimpleComponent {
+//     user = 1;
+//     constructor() {
+//
+//     }
+// }
+//
+//
+// Component(html, SimpleComponent);
+
+const html = require('./render.html');
+
+// function htmlToElement(html: string): Element {
+//     console.log('html', html);
+//     const template = document.createElement('template');// Never return a text node of whitespace as the result
+//     template.innerHTML = html;
+//     // @ts-ignore
+//     return template;
+// }
+
+function htmlToElement(htmlString: string): Element {
+    const div = document.createElement('div');
+    console.log('2222', htmlString.trim());
+    div.innerHTML = htmlString;
+    console.log('3333', div);
+
+    // Change this to div.childNodes to support multiple top-level nodes
+    // @ts-ignore
+    return div.firstChild;
+}
+
+function observable(input: any, notify: () => void) {
+    return new Proxy(input, {
+        set: (target, property, value) => {
+            target[property] = value;
+            notify();
+            return true;
+        }
+    });
+}
+
+function get(obj: any, path: string) {
+    let paths = path.split('.')
+        , current = obj
+        , i;
+    for (i = 0; i < paths.length; ++i) {
+        if (current[paths[i]] == undefined) {
+            return undefined;
+        } else {
+            current = current[paths[i]];
+        }
+    }
+    return current;
+}
+
+class ViewModel {
+    public model: any;
+    constructor(private element: Element, model: any) {
+        this.model = observable(model, this.notify.bind(this));
+        this.render();
+        this.handlers();
+    }
+
+    notify() {
+        this.render();
+    }
+
+    handlers() {
+        const list = this.element.querySelectorAll('[tl-action]');
+        if (list && list.length) {
+            list.forEach(
+                item => {
+                    const [action, handler] = item.getAttribute('tl-action').split(':');
+
+                    item.addEventListener(action, (evt) => {
+                        get(this.model, handler).call(this.model, evt);
+                    })
+                }
+            );
+        }
+    }
+
+    mountTo(element: Element | string) {
+        if (typeof element === 'string') {
+            const dest = document.body.querySelector(element);
+            if (dest) {
+                dest.append(this.element);
+            }
+        } else {
+            element.append(this.element);
+        }
+    }
+
+    render() {
+        const list = this.element.querySelectorAll('[tl-bind]');
+        if (list && list.length) {
+            list.forEach(
+                item => {
+                    const path = item.getAttribute('tl-bind');
+                    item.innerHTML = get(this.model, path);
+                }
+            );
+        }
+    }
+}
+
+class SomeComponent {
+    title = 'Hello';
+    user = { name: 'Alexey' };
+
+    onCounterPlus() {
+        this.title = 'Pidor';
+    }
+
+    onChangeInput(evt: KeyboardEvent) {
+        this.title = (evt.target as HTMLInputElement).value;
+    }
+
+    onBlurInput() {
+        this.title = 'OGROMNIY ANUS LEXI';
+    }
+}
+
+const model = new SomeComponent();
+
+
+const vm = new ViewModel(htmlToElement(html), model);
+
+vm.mountTo(document.body);

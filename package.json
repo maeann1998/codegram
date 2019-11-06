@@ -11,7 +11,8 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
     "build.all": "npm run build.prod && npm run build.esnext",
-    "test": "karma start karma.config.js"
+    "test": "karma start karma.config.js",
+    "preinstall": "npx npm-force-resolutions"
   },
   "keywords": [
     "webpack",
@@ -44,9 +45,13 @@
     "@babel/preset-typescript": "^7.3.3"
   },
   "dependencies": {
+    "html-loader": "^0.5.5",
     "localforage": "^1.7.3",
     "telegram-api-js": "^1.2.9",
     "telegram-mtproto": "^2.2.2",
+    "worker-loader": "^2.0.0"
+  },
+  "resolutions": {
     "worker-loader": "^2.0.0"
   }
 }
