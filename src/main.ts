@@ -4,6 +4,7 @@ const MTProto = require('telegram-mtproto').default;
 import * as LocalForage from 'localforage';
 import { apiClient } from './core/telegram-client';
 import { TelegramAPI } from './lib/api/client';
+import { ViewModel } from './utils/view-model';
 
 // @ts-ignore
 window.tltl = apiClient;
@@ -171,73 +172,11 @@ function get(obj: any, path: string) {
     return current;
 }
 
-class ViewModel {
-    public model: any;
-    constructor(private element: Element, model: any) {
-        this.model = observable(model, this.notify.bind(this));
-        this.render();
-        this.handlers();
-    }
-
-    notify() {
-        this.render();
-    }
-
-    handlers() {
-        const list = this.element.querySelectorAll('[tl-action]');
-        if (list && list.length) {
-            list.forEach(
-                item => {
-                    const [action, handler] = item.getAttribute('tl-action').split(':');
-
-                    item.addEventListener(action, (evt) => {
-                        get(this.model, handler).call(this.model, evt);
-                    })
-                }
-            );
-        }
-    }
-
-    mountTo(element: Element | string) {
-        if (typeof element === 'string') {
-            const dest = document.body.querySelector(element);
-            if (dest) {
-                dest.append(this.element);
-            }
-        } else {
-            element.append(this.element);
-        }
-    }
-
-    renderList() {
-        const list = this.element.querySelectorAll('[tl-list]');
-        if (list && list.length) {
-            list.forEach(
-                item => {
-                    const path = item.getAttribute('tl-list');
-                    item.innerHTML = get(this.model, path);
-                }
-            );
-        }
-    }
-
-    render() {
-        const list = this.element.querySelectorAll('[tl-bind]');
-        if (list && list.length) {
-            list.forEach(
-                item => {
-                    const path = item.getAttribute('tl-bind');
-                    item.innerHTML = get(this.model, path);
-                }
-            );
-        }
-    }
-}
 
 class SomeComponent {
     title = 'Hello';
     user = { name: 'Alexey' };
-    elements: any = [];
+    elements: any = [{name: 'dsadsa', id: 3}];
     constructor() {
         setTimeout(
             () => {

@@ -1,8 +1,20 @@
 import { getPath } from './get-path';
 import { createObservable } from './observable-model';
 
-class ViewModel {
+enum Selectors {
+    TL_ACTION = 'tl-action',
+    TL_LIST = 'tl-list',
+    TL_BIND = 'tl-bind',
+    TL_ID = 'tl-id'
+}
+
+export class ViewModel {
     public model: any;
+
+    static toSelector(selectorName: Selectors) {
+        return `[${selectorName}]`;
+    }
+
     constructor(private element: Element, model: any) {
         this.model = createObservable(model);
         this.renderLists();
@@ -15,12 +27,12 @@ class ViewModel {
     }
 
     handlers() {
-        const list = this.element.querySelectorAll('[tl-action]');
+        const list = this.element.querySelectorAll(ViewModel.toSelector(Selectors.TL_ACTION));
         if (list && list.length) {
             list.forEach(
                 item => {
-                    const [action, handler] = item.getAttribute('tl-action').split(':');
-                    item.removeAttribute('tl-action');
+                    const [action, handler] = item.getAttribute(Selectors.TL_ACTION).split(':');
+                    item.removeAttribute(Selectors.TL_ACTION);
 
                     item.addEventListener(action, (evt) => {
                         getPath(this.model, handler).call(this.model, evt);
@@ -42,16 +54,16 @@ class ViewModel {
     }
 
     renderLists() {
-        const list = this.element.querySelectorAll<HTMLElement>('[tl-list]');
+        const list = this.element.querySelectorAll<HTMLElement>(ViewModel.toSelector(Selectors.TL_LIST));
         if (list && list.length) {
             list.forEach(
                 item => {
-                    const value = item.getAttribute('tl-list');
+                    const value = item.getAttribute(Selectors.TL_LIST);
                     const [controls, keyValue] = value.split(';').map(v => v.trim());
                     const [listItem, listPath] = controls.split(' of ');
                     const key = keyValue ? keyValue.split(':')[1].trim() : null;
-                    const commentNode = document.createComment(`tl-list: ${controls}`);
-                    item.removeAttribute('tl-list');
+                    const commentNode = document.createComment(`${Selectors.TL_LIST}: ${controls}`);
+                    item.removeAttribute(Selectors.TL_LIST);
                     const itemToRepeat = item.cloneNode(true) as HTMLElement;
 
                     this.renderList(commentNode, itemToRepeat, listPath, listItem, key);
@@ -78,7 +90,7 @@ class ViewModel {
                 }
 
                 const itemElement = element.cloneNode(true) as HTMLElement;
-                itemElement.setAttribute('tl-id', item.id);
+                itemElement.setAttribute(Selectors.TL_ID, item.id);
                 const newModel = Object.create(this.model);
                 newModel[itemName] = item;
                 const vm = new ViewModel(itemElement, newModel);
@@ -89,12 +101,12 @@ class ViewModel {
     }
 
     render() {
-        const list = this.element.querySelectorAll('[tl-bind]');
+        const list = this.element.querySelectorAll(ViewModel.toSelector(Selectors.TL_BIND));
         if (list && list.length) {
             list.forEach(
                 item => {
-                    const path = item.getAttribute('tl-bind');
-                    item.removeAttribute('tl-bind');
+                    const path = item.getAttribute(Selectors.TL_BIND);
+                    item.removeAttribute(Selectors.TL_BIND);
                     this.model.$onChange(path, (value: any) => {
                         item.innerHTML = value;
                     });

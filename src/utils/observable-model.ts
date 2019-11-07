@@ -3,7 +3,7 @@ import { getPath } from './get-path';
 type HandlerFn = (value: any) => void;
 
 export function createObservable(input: any) {
-    const handlers: Record<string, HandlerFn[]> = {};
+    let handlers: Record<string, HandlerFn[]> = {};
     const processObject = (obj: any, path: string[] = []) => {
         for (let key in obj) {
             let _value: any = obj[key];
