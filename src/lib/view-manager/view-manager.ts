@@ -1,4 +1,4 @@
-import { ViewModel } from '../../utils/view-model';
+import { ViewModel } from '../view-model/view-model';
 
 export class PageViewManager {
     private _views = new Map<string, ViewModel>();

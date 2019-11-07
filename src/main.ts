@@ -4,15 +4,13 @@ const MTProto = require('telegram-mtproto').default;
 import * as LocalForage from 'localforage';
 import { apiClient } from './core/telegram-client';
 import { TelegramAPI } from './lib/api/client';
-import { ViewModel } from './utils/view-model';
+import { ViewModel } from './lib/view-model/view-model';
 
 // @ts-ignore
 window.tltl = apiClient;
 
 async function getContacts() {
-    console.log('waaat?');
     const contacts = await apiClient.call<any>('contacts', 'getContacts');
-    console.log('contacts', contacts);
 }
 //
 // getContacts();
@@ -58,47 +56,43 @@ async function sentCode(phone_number: string) {
         api_id        : TelegramAPI.API_ID,
         api_hash      : TelegramAPI.API_HASH
     };
-    console.log('app id', params);
     const sendCodeResponse = await apiClient.call('auth', 'sendCode', params);
-    console.log('its me', sendCodeResponse);
     return sendCodeResponse;
 }
-
-bootstrap().then(
-    () => {
-        const phone = document.querySelector<HTMLInputElement>('[data-app-id="phone"]');
-        const code = document.querySelector<HTMLInputElement>('[data-app-id="code"]');
-        const getCodeBtn = document.querySelector('[data-app-id="getCode"]');
-        const signInBtn = document.querySelector('[data-app-id="signIn"]');
-        const getContactsBtn = document.querySelector('[data-app-id="getContacts"]');
-        const signUpBtn = document.querySelector('[data-app-id="signUp"]');
-
-        let resultSentCode: any;
-
-        getCodeBtn.addEventListener('click', async evt => {
-            const phoneValue = phone.value;
-            resultSentCode = await sentCode(phoneValue);
-        });
-
-        signInBtn.addEventListener('click', async evt => {
-            const phoneValue = phone.value;
-            const codeValue = code.value;
-            const resultSignIn = await signIn(phoneValue, resultSentCode.phone_code_hash, codeValue);
-            console.log('result signin', resultSignIn);
-        });
-
-        getContactsBtn.addEventListener('click', async evt => {
-           getContacts();
-        });
-
-        signUpBtn.addEventListener('click', async evt => {
-            const phoneValue = phone.value;
-            const codeValue = code.value;
-            console.log('code value', codeValue);
-            resultSentCode = await signUp(phoneValue, resultSentCode.phone_code_hash, codeValue);
-        });
-    }
-);
+//
+// bootstrap().then(
+//     () => {
+//         const phone = document.querySelector<HTMLInputElement>('[data-app-id="phone"]');
+//         const code = document.querySelector<HTMLInputElement>('[data-app-id="code"]');
+//         const getCodeBtn = document.querySelector('[data-app-id="getCode"]');
+//         const signInBtn = document.querySelector('[data-app-id="signIn"]');
+//         const getContactsBtn = document.querySelector('[data-app-id="getContacts"]');
+//         const signUpBtn = document.querySelector('[data-app-id="signUp"]');
+//
+//         let resultSentCode: any;
+//
+//         getCodeBtn.addEventListener('click', async evt => {
+//             const phoneValue = phone.value;
+//             resultSentCode = await sentCode(phoneValue);
+//         });
+//
+//         signInBtn.addEventListener('click', async evt => {
+//             const phoneValue = phone.value;
+//             const codeValue = code.value;
+//             const resultSignIn = await signIn(phoneValue, resultSentCode.phone_code_hash, codeValue);
+//         });
+//
+//         getContactsBtn.addEventListener('click', async evt => {
+//            getContacts();
+//         });
+//
+//         signUpBtn.addEventListener('click', async evt => {
+//             const phoneValue = phone.value;
+//             const codeValue = code.value;
+//             resultSentCode = await signUp(phoneValue, resultSentCode.phone_code_hash, codeValue);
+//         });
+//     }
+// );
 
 
 // function Component(
@@ -139,9 +133,7 @@ const html = require('./render.html');
 
 function htmlToElement(htmlString: string): Element {
     const div = document.createElement('div');
-    console.log('2222', htmlString.trim());
     div.innerHTML = htmlString;
-    console.log('3333', div);
 
     // Change this to div.childNodes to support multiple top-level nodes
     // @ts-ignore
@@ -174,17 +166,22 @@ function get(obj: any, path: string) {
 
 
 class SomeComponent {
+    private i = 0;
     title = 'Hello';
     user = { name: 'Alexey' };
-    elements: any = [];
-    constructor() {
-        setTimeout(
-            () => {
-                this.elements = [{name: 'Penis', id: 2}, { name: 'Denis', id: 3 }];
-            }, 2000
-        );
+    elements: any = [{name: 'Puska', id: this.i++}];
+
+    addElem() {
+        const list = this.elements.slice();
+        list.push({name: `Piska ${this.i}`, id: this.i++});
+        this.elements = list;
     }
 
+    removeElem() {
+        const list = this.elements.slice();
+        list.pop();
+        this.elements = list;
+    }
 
     onCounterPlus() {
         this.title = 'Pidor';
@@ -204,4 +201,4 @@ const model = new SomeComponent();
 
 const vm = new ViewModel(htmlToElement(html), model);
 
-vm.mountTo(document.body);
+// vm.mountTo(document.body);

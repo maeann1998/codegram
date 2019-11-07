@@ -1,4 +1,4 @@
-import { getPath } from './get-path';
+import { getPath } from '../../utils/get-path';
 import { createObservable } from './observable-model';
 
 enum Selectors {
@@ -74,7 +74,9 @@ export class ViewModel {
     }
 
     renderList(appendNode: Node, element: Node, listPath: string, itemName: string, key: string) {
-        const insertNode = (elem: Element) => appendNode.parentNode.insertBefore(elem, appendNode);
+        const insertNode = (elem: Element) => {
+            setTimeout(() => appendNode.parentNode.insertBefore(elem, appendNode));
+        };
         let rendered: ViewModel[] = [];
         this.model.$onChange(listPath, (arr: any[]) => {
             let item: any;
@@ -96,6 +98,11 @@ export class ViewModel {
                 const vm = new ViewModel(itemElement, newModel);
                 insertNode(vm.vmElement);
                 rendered.push(vm);
+            }
+
+            if (rendered.length > arr.length) {
+                const last = rendered.splice(arr.length, rendered.length - arr.length);
+                last.forEach(vm => vm.destroy());
             }
         });
     }
