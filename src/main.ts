@@ -176,7 +176,7 @@ function get(obj: any, path: string) {
 class SomeComponent {
     title = 'Hello';
     user = { name: 'Alexey' };
-    elements: any = [{name: 'dsadsa', id: 3}];
+    elements: any = [];
     constructor() {
         setTimeout(
             () => {
