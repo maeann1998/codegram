@@ -1,169 +1,12 @@
 import './core';
-// import MTProto from 'telegram-mtproto'.default;
-const MTProto = require('telegram-mtproto').default;
 import * as LocalForage from 'localforage';
-import { apiClient } from './core/telegram-client';
-import { TelegramAPI } from './lib/api/client';
+// import { TelegramAPI } from './lib/api/client';
 import { ViewModel } from './lib/view-model/view-model';
-
+import { htmlToElement } from './utils/string-to-html';
+// import { bytesToHex } from './lib/mtproto/bin_utils';
 // @ts-ignore
-window.tltl = apiClient;
-
-async function getContacts() {
-    const contacts = await apiClient.call<any>('contacts', 'getContacts');
-}
-//
-// getContacts();
-
-function bootstrap(): Promise<void> {
-    return new Promise((resolve, reject) => {
-       if (document.body) {
-           resolve();
-       } else {
-           document.addEventListener('load', () => {
-                resolve();
-           });
-       }
-    });
-}
-
-async function signIn(phone_number: string, phone_code_hash: string, phone_code: string) {
-        const { user } = await apiClient.call('auth', 'signIn', {
-            phone_number,
-            phone_code_hash,
-            phone_code
-        });
-        return user;
-}
-
-async function signUp(phone_number: string, phone_code_hash: string, phone_code: string) {
-    const { user } = await apiClient.call('auth', 'signUp', {
-        phone_number,
-        phone_code_hash,
-        phone_code,
-        first_name: 'Saska',
-        last_name: 'Bobrov'
-    });
-    return user;
-}
-
-
-
-async function sentCode(phone_number: string) {
-    const params = {
-        phone_number,
-        current_number: false,
-        api_id        : TelegramAPI.API_ID,
-        api_hash      : TelegramAPI.API_HASH
-    };
-    const sendCodeResponse = await apiClient.call('auth', 'sendCode', params);
-    return sendCodeResponse;
-}
-//
-// bootstrap().then(
-//     () => {
-//         const phone = document.querySelector<HTMLInputElement>('[data-app-id="phone"]');
-//         const code = document.querySelector<HTMLInputElement>('[data-app-id="code"]');
-//         const getCodeBtn = document.querySelector('[data-app-id="getCode"]');
-//         const signInBtn = document.querySelector('[data-app-id="signIn"]');
-//         const getContactsBtn = document.querySelector('[data-app-id="getContacts"]');
-//         const signUpBtn = document.querySelector('[data-app-id="signUp"]');
-//
-//         let resultSentCode: any;
-//
-//         getCodeBtn.addEventListener('click', async evt => {
-//             const phoneValue = phone.value;
-//             resultSentCode = await sentCode(phoneValue);
-//         });
-//
-//         signInBtn.addEventListener('click', async evt => {
-//             const phoneValue = phone.value;
-//             const codeValue = code.value;
-//             const resultSignIn = await signIn(phoneValue, resultSentCode.phone_code_hash, codeValue);
-//         });
-//
-//         getContactsBtn.addEventListener('click', async evt => {
-//            getContacts();
-//         });
-//
-//         signUpBtn.addEventListener('click', async evt => {
-//             const phoneValue = phone.value;
-//             const codeValue = code.value;
-//             resultSentCode = await signUp(phoneValue, resultSentCode.phone_code_hash, codeValue);
-//         });
-//     }
-// );
-
-
-// function Component(
-//     template: string,
-//     controller: () => void,
-// ) {
-//
-
-//     const _controller = new SimpleComponent();
-//     const element = htmlToElement(template);
-//
-//     console.log('eleement', element, _controller);
-//     // console.log('require', require);
-//     // const template = import(templateUrl);
-//     // console.log('template', template);
-// }
-//
-//
-// class SimpleComponent {
-//     user = 1;
-//     constructor() {
-//
-//     }
-// }
-//
-//
-// Component(html, SimpleComponent);
 
 const html = require('./render.html');
-
-// function htmlToElement(html: string): Element {
-//     console.log('html', html);
-//     const template = document.createElement('template');// Never return a text node of whitespace as the result
-//     template.innerHTML = html;
-//     // @ts-ignore
-//     return template;
-// }
-
-function htmlToElement(htmlString: string): Element {
-    const div = document.createElement('div');
-    div.innerHTML = htmlString;
-
-    // Change this to div.childNodes to support multiple top-level nodes
-    // @ts-ignore
-    return div.firstChild;
-}
-
-function observable(input: any, notify: () => void) {
-    return new Proxy(input, {
-        set: (target, property, value) => {
-            target[property] = value;
-            notify();
-            return true;
-        }
-    });
-}
-
-function get(obj: any, path: string) {
-    let paths = path.split('.')
-        , current = obj
-        , i;
-    for (i = 0; i < paths.length; ++i) {
-        if (current[paths[i]] == undefined) {
-            return undefined;
-        } else {
-            current = current[paths[i]];
-        }
-    }
-    return current;
-}
-
 
 class SomeComponent {
     private i = 0;
@@ -201,4 +44,60 @@ const model = new SomeComponent();
 
 const vm = new ViewModel(htmlToElement(html), model);
 
+
 // vm.mountTo(document.body);
+// @ts-ignore
+const ContainerModule = require('ioc-js');
+// console.log('inv', inv);
+// @ts-ignore
+window.ContainerModule = ContainerModule;
+// @ts-ignore
+// window.jQuery =
+// @ts-ignore
+window.jQuery = window.$ = require('jquery');
+
+// @ts-ignore
+
+// @ts-ignore
+window.Rusha = require('rusha');
+// @ts-ignore
+window.$(window).on('click keydown', () => {
+    console.log('pidor');
+});
+
+import { str2bigInt } from './lib/mtproto/libs/leemon/leemon';
+// @ts-ignore
+window.str2bigInt = str2bigInt;
+
+import 'lib/mtproto/libs/api-lib';
+// @ts-ignore
+window.telegramApi.setConfig({
+    app: {
+        id: 1194503, /* App ID */
+        hash: '5ac6c0763d8420ed685b738e59fd5e86', /* App hash */
+        version: '0.0.0' /* App version */
+    },
+    server: {
+        test: [
+            {
+                id: 2, /* DC ID */
+                host: '149.154.167.40',
+                port: 443
+            }
+        ],
+        production: [
+            {
+                id: 2, /* DC ID */
+                host: '0.0.0.0',
+                port: 123
+            }
+        ]
+    }
+});
+
+// @ts-ignore
+window.telegramApi.sendCode('+79126252815').then(res => {
+   console.log('res', res);
+}).catch((err: any) => {
+    console.error(err);
+});
