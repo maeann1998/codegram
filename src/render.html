@@ -1,12 +1,14 @@
 <div>
     <div tl-bind="title"></div>
-    <div tl-list="item of elements">
-        <div tl-bind="item.name"></div>
-
-        <div tl-bind="title"></div>
-    </div>
     <div tl-bind="user.name"></div>
     <button tl-action="click:onCounterPlus">On click</button>
+    <button tl-action="click:addElem">Add element</button>
+    <button tl-action="click:removeElem">Remove element</button>
     <input tl-action="input:onChangeInput">
     <input tl-action="blur:onBlurInput">
+
+    <div tl-list="item of elements; $key: id">
+        <div tl-bind="item.name"></div>
+        <div tl-bind="title"></div>
+    </div>
 </div>
