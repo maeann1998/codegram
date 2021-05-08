@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "crypto-js": "^3.1.9-1",
-    "google-closure-library": "^20191027.0.1",
+    "google-closure-library": "^20200315.0.0",
     "html-loader": "^0.5.5",
     "inversify": "^2.0.1",
     "ioc-js": "0.0.4",
